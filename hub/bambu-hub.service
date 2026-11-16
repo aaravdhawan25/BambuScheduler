@@ -1,0 +1,26 @@
+# systemd unit for the hub. Install:
+#   sudo cp bambu-hub.service /etc/systemd/system/
+#   sudo systemctl daemon-reload && sudo systemctl enable --now bambu-hub
+#   journalctl -u bambu-hub -f
+# Adjust User and paths to where you cloned the repo.
+[Unit]
+Description=Bambu print scheduler hub
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User=arduino
+WorkingDirectory=/home/arduino/BambuScheduler/hub
+ExecStart=/home/arduino/BambuScheduler/hub/.venv/bin/python -m bambu_hub
+Restart=always
+RestartSec=10
+# Stop is graceful (SIGTERM); the hub finishes its current tick.
+TimeoutStopSec=30
+NoNewPrivileges=true
+ProtectSystem=strict
+ReadWritePaths=/tmp
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
